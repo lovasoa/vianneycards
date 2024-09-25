@@ -36,6 +36,10 @@
             transition: all 1.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
             left: calc(50% - 21.3vh);
             top: calc(50% - 30vh);
+            cursor: grab;
+        }
+        .card-container:active {
+            cursor: grabbing;
         }
         .card-container:hover {
             scale: 1.1;
@@ -94,6 +98,10 @@
         ];
         let currentIndex = 0;
         const cardStage = document.getElementById('card-stage');
+        let isDragging = false;
+        let startX, startY, startTransform;
+        let moveThreshold = 5;
+        let isMoved = false;
 
         function preloadImages(callback) {
             let loadedCount = 0;
@@ -113,15 +121,64 @@
             images.slice(0, -1).forEach((image, index) => {
                 const card = createCard(image, index);
                 cardStage.appendChild(card);
+                addDragListeners(card);
             });
             document.getElementById('loading').style.display = 'none';
             cardStage.style.display = 'block';
             flyInNextCard();
         }
 
-        preloadImages(() => {
-            initializeCards();
-        });
+        function addDragListeners(card) {
+            card.addEventListener('mousedown', startDrag);
+            card.addEventListener('touchstart', startDrag);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', drag);
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+        }
+
+        function startDrag(e) {
+            if (e.type === 'touchstart') {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            } else {
+                startX = e.clientX;
+                startY = e.clientY;
+            }
+            isDragging = true;
+            isMoved = false;
+            startTransform = window.getComputedStyle(this).getPropertyValue('transform');
+            this.style.transition = 'none';
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            const currentCard = cardStage.children[currentIndex];
+            let currentX, currentY;
+            if (e.type === 'touchmove') {
+                currentX = e.touches[0].clientX;
+                currentY = e.touches[0].clientY;
+            } else {
+                currentX = e.clientX;
+                currentY = e.clientY;
+            }
+            const deltaX = startX - currentX; // Corrected to move left
+            const deltaY = currentY - startY;
+            
+            if (Math.abs(deltaX) > moveThreshold || Math.abs(deltaY) > moveThreshold) {
+                isMoved = true;
+                currentCard.style.transform = `${startTransform} translate3d(${deltaX}px, ${deltaY}px, 0) rotateY(${deltaX * 0.15}deg)`;
+            }
+        }
+
+        function endDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+            const currentCard = cardStage.children[currentIndex];
+            currentCard.style.transform = '';
+            currentCard.style.transition = '';
+        }
 
         function createCard(image, index) {
             const card = document.createElement('div');
@@ -155,7 +212,8 @@
             currentCard.classList.add('reveal');
         }
 
-        function handleCardClick() {
+        function handleCardClick(e) {
+            if (isMoved) return;
             const currentCard = cardStage.children[currentIndex];
             if (!currentCard.classList.contains('reveal')) {
                 revealCard();
@@ -165,8 +223,8 @@
         }
 
         function nextCard() {
-            flyOutCurrentCard('left');
-            currentIndex = (currentIndex + 1) % images.length;
+            flyOutCurrentCard('right');
+            currentIndex = (currentIndex + 1) % (images.length - 1);
             setTimeout(() => {
                 if (currentIndex === 0) {
                     resetSlideshow();
@@ -182,8 +240,8 @@
         }
 
         function previousCard() {
-            flyOutCurrentCard('right');
-            currentIndex = (currentIndex - 1 + images.length) % images.length;
+            flyOutCurrentCard('left');
+            currentIndex = (currentIndex - 1 + images.length - 1) % (images.length - 1);
             setTimeout(flyInNextCard, 600);
         }
 
