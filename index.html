@@ -223,7 +223,7 @@
         }
 
         function nextCard() {
-            flyOutCurrentCard('right');
+            flyOutCurrentCard('left');
             currentIndex = (currentIndex + 1) % (images.length - 1);
             setTimeout(() => {
                 if (currentIndex === 0) {
@@ -240,7 +240,7 @@
         }
 
         function previousCard() {
-            flyOutCurrentCard('left');
+            flyOutCurrentCard('right');
             currentIndex = (currentIndex - 1 + images.length - 1) % (images.length - 1);
             setTimeout(flyInNextCard, 600);
         }
