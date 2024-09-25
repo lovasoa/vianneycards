@@ -25,7 +25,7 @@
             height: 80vh;
             position: absolute;
             transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 1s ease-in-out;
             left: calc(50% - 28.4vh);
         }
         .card {
@@ -48,32 +48,17 @@
             background-size: cover;
             background-position: center;
         }
-        .enter {
-            animation: summonCard 1.2s forwards;
+        .fly-in {
+            transform: translateX(0) rotateY(180deg);
         }
-        .exit {
-            animation: banishCard 1.2s forwards;
+        .fly-out-left {
+            transform: translateX(-100vw) rotateY(180deg);
         }
-        @keyframes summonCard {
-            0% { transform: translateX(100%) rotateY(90deg); opacity: 0; }
-            50% { transform: translateX(0) rotateY(-30deg); opacity: 0.5; }
-            100% { transform: translateX(0) rotateY(0deg); opacity: 1; }
+        .fly-out-right {
+            transform: translateX(100vw) rotateY(180deg);
         }
-        @keyframes banishCard {
-            0% { transform: translateX(0) rotateY(0deg); opacity: 1; }
-            50% { transform: translateX(0) rotateY(30deg); opacity: 0.5; }
-            100% { transform: translateX(-100%) rotateY(-90deg); opacity: 0; }
-        }
-        .glow {
-            animation: glowPulse 2s infinite alternate;
-        }
-        @keyframes glowPulse {
-            from { box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
-            to { box-shadow: 0 0 25px rgba(255, 215, 0, 0.3), 0 0 35px rgba(255, 165, 0, 0.2); }
-        }
-        @keyframes hover {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        .reveal {
+            transform: rotateY(0deg);
         }
     </style>
 </head>
@@ -91,12 +76,11 @@
 
         function createCard(image, index) {
             const card = document.createElement('div');
-            card.className = 'card-container';
+            card.className = 'card-container fly-out-right';
             card.innerHTML = `
                 <div class="card face" style="background-image: url(${image});"></div>
                 <div class="card back" style="background-image: url('back.jpg');"></div>
             `;
-            card.style.transform = `translateX(100vw) rotateY(180deg)`;
             card.style.zIndex = images.length - index;
             return card;
         }
@@ -111,19 +95,19 @@
 
         function flyInNextCard() {
             const currentCard = cardStage.children[currentIndex];
-            currentCard.style.transition = 'transform 1s ease-in-out';
-            currentCard.style.transform = 'translateX(0) rotateY(180deg)';
+            currentCard.classList.remove('fly-out-right', 'fly-out-left');
+            currentCard.classList.add('fly-in');
         }
 
         function flyOutCurrentCard(direction) {
             const currentCard = cardStage.children[currentIndex];
-            currentCard.style.transition = 'transform 1s ease-in-out';
-            currentCard.style.transform = `translateX(${direction === 'left' ? '-' : ''}100vw) rotateY(180deg)`;
+            currentCard.classList.remove('fly-in', 'reveal');
+            currentCard.classList.add(direction === 'left' ? 'fly-out-left' : 'fly-out-right');
         }
 
         function revealCard() {
             const currentCard = cardStage.children[currentIndex];
-            currentCard.style.transform = 'rotateY(0deg)';
+            currentCard.classList.add('reveal');
         }
 
         function nextCard() {
@@ -140,7 +124,7 @@
 
         function handleCardClick() {
             const currentCard = cardStage.children[currentIndex];
-            if (currentCard.style.transform.includes('rotateY(180deg)')) {
+            if (!currentCard.classList.contains('reveal')) {
                 revealCard();
             } else {
                 nextCard();
