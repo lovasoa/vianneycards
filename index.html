@@ -174,7 +174,8 @@
             if (Math.abs(deltaX) > moveThreshold || Math.abs(deltaY) > moveThreshold) {
                 isMoved = true;
                 const rotationY = 90 * Math.tanh(deltaX * 0.001);
-                currentCard.style.transform = `${startTransform} translate3d(${deltaX}px, ${deltaY}px, 0) rotateY(${rotationY}deg)`;
+                const rotationX = -180 * Math.tanh(deltaY * 0.001);
+                currentCard.style.transform = `${startTransform} translate3d(${deltaX}px, ${deltaY}px, 0) rotateY(${rotationY}deg) rotateX(${rotationX}deg)`;
             }
         }
 
