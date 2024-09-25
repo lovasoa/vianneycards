@@ -22,6 +22,9 @@
             transform-style: preserve-3d;
             animation: stageHover 10s infinite ease-in-out;
         }
+        #card-stage.dragging {
+            animation: none;
+        }
         @keyframes stageHover {
             0%, 100% { transform: translate3d(0, 0, 0) rotateX(2deg) rotateY(20deg); }
             25% { transform: translate3d(10px, -10px, 20px) rotateX(-2deg) rotateY(-10deg); }
@@ -41,7 +44,7 @@
         .card-container:active {
             cursor: grabbing;
         }
-        .card-container:hover {
+        .card-container:hover:not(.dragging) {
             scale: 1.1;
         }
         .card {
@@ -149,6 +152,8 @@
             isMoved = false;
             startTransform = window.getComputedStyle(this).getPropertyValue('transform');
             this.style.transition = 'none';
+            this.classList.add('dragging');
+            cardStage.classList.add('dragging');
         }
 
         function drag(e) {
@@ -168,7 +173,8 @@
             
             if (Math.abs(deltaX) > moveThreshold || Math.abs(deltaY) > moveThreshold) {
                 isMoved = true;
-                currentCard.style.transform = `${startTransform} translate3d(${deltaX}px, ${deltaY}px, 0) rotateY(${deltaX * 0.15}deg)`;
+                const rotationY = 90 * Math.tanh(deltaX * 0.001);
+                currentCard.style.transform = `${startTransform} translate3d(${deltaX}px, ${deltaY}px, 0) rotateY(${rotationY}deg)`;
             }
         }
 
@@ -178,6 +184,8 @@
             const currentCard = cardStage.children[currentIndex];
             currentCard.style.transform = '';
             currentCard.style.transition = '';
+            currentCard.classList.remove('dragging');
+            cardStage.classList.remove('dragging');
         }
 
         function createCard(image, index) {
