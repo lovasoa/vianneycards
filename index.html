@@ -83,16 +83,45 @@
     </style>
 </head>
 <body>
-    <div id="card-stage" class="dramatic-stage">
+    <div id="loading">Loading...</div>
+    <div id="card-stage" class="dramatic-stage" style="display: none;">
         <!-- Cards will be dynamically added here -->
     </div>
     <script>
         const images = [
             'card1.png', 'card2.png', 'card3.png', 'card4.png', 'card5.png',
-            'card6.png', 'card7.png', 'card8.png'
+            'card6.png', 'card7.png', 'card8.png', 'back.jpg'
         ];
         let currentIndex = 0;
         const cardStage = document.getElementById('card-stage');
+
+        function preloadImages(callback) {
+            let loadedCount = 0;
+            images.forEach(src => {
+                const img = new Image();
+                img.onload = img.onerror = () => {
+                    loadedCount++;
+                    if (loadedCount === images.length) {
+                        callback();
+                    }
+                };
+                img.src = src;
+            });
+        }
+
+        function initializeCards() {
+            images.slice(0, -1).forEach((image, index) => {
+                const card = createCard(image, index);
+                cardStage.appendChild(card);
+            });
+            document.getElementById('loading').style.display = 'none';
+            cardStage.style.display = 'block';
+            flyInNextCard();
+        }
+
+        preloadImages(() => {
+            initializeCards();
+        });
 
         function createCard(image, index) {
             const card = document.createElement('div');
@@ -101,16 +130,8 @@
                 <div class="card face" style="background-image: url(${image});"></div>
                 <div class="card back" style="background-image: url('back.jpg');"></div>
             `;
-            card.style.zIndex = images.length - index;
+            card.style.zIndex = images.length - index - 1;
             return card;
-        }
-
-        function initializeCards() {
-            images.forEach((image, index) => {
-                const card = createCard(image, index);
-                cardStage.appendChild(card);
-            });
-            flyInNextCard();
         }
 
         function flyInNextCard() {
