@@ -190,8 +190,18 @@
             if (!isDragging) return;
             isDragging = false;
             const currentCard = cardStage.children[currentIndex];
-            currentCard.style.transform = '';
-            currentCard.style.transition = '';
+            const cardRect = currentCard.getBoundingClientRect();
+            const screenWidth = window.innerWidth;
+
+            if (cardRect.right < screenWidth * 0.2) {
+                nextCard();
+            } else if (cardRect.left > screenWidth * 0.8) {
+                previousCard();
+            } else {
+                currentCard.style.transform = '';
+                currentCard.style.transition = '';
+            }
+
             currentCard.classList.remove('dragging');
             cardStage.classList.remove('dragging');
         }
