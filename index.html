@@ -91,13 +91,32 @@
         .reveal.dragging {
             animation: none;
         }
+        
+        .card-indicator {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            backdrop-filter: blur(5px);
+            transition: opacity 0.3s ease;
+        }
+        
+        .card-indicator.hidden {
+            opacity: .3;
+        }
     </style>
 </head>
 <body>
     <div id="loading">Loading...</div>
     <div id="card-stage" class="dramatic-stage" style="display: none;">
-        <!-- Cards will be dynamically added here -->
     </div>
+    <div id="card-indicator" class="card-indicator hidden"></div>
+
     <script>
         const images = [
             'card1.jpg', 'card2.jpg', 'card3.jpg', 'card4.jpg', 'card5.jpg',
@@ -105,6 +124,7 @@
         ];
         let currentIndex = 0;
         const cardStage = document.getElementById('card-stage');
+        const cardIndicator = document.getElementById('card-indicator');
         let isDragging = false;
         let startX, startY, startTransform;
         let moveThreshold = 5;
@@ -133,6 +153,7 @@
             document.getElementById('loading').style.display = 'none';
             cardStage.style.display = 'block';
             flyInNextCard();
+            updateCardIndicator();
         }
 
         function addDragListeners(card) {
@@ -238,6 +259,12 @@
             currentCard.classList.add('reveal');
         }
 
+        function updateCardIndicator() {
+            cardIndicator.textContent = `${currentIndex + 1}/${images.length - 1}`;
+            cardIndicator.classList.remove('hidden');
+            setTimeout(() => cardIndicator.classList.add('hidden'), 2000);
+        }
+
         function handleCardClick(e) {
             if (isMoved) return;
             const currentCard = cardStage.children[currentIndex];
@@ -246,6 +273,7 @@
             } else {
                 nextCard();
             }
+            updateCardIndicator();
         }
 
         function nextCard() {
@@ -257,6 +285,7 @@
                 } else {
                     flyInNextCard();
                 }
+                updateCardIndicator();
             }, 600);
         }
 
@@ -268,7 +297,10 @@
         function previousCard() {
             flyOutCurrentCard('right');
             currentIndex = (currentIndex - 1 + images.length - 1) % (images.length - 1);
-            setTimeout(flyInNextCard, 600);
+            setTimeout(() => {
+                flyInNextCard();
+                updateCardIndicator();
+            }, 600);
         }
 
         function handleKeyPress(event) {
