@@ -226,13 +226,14 @@
             const cardRect = currentCard.getBoundingClientRect();
             const screenWidth = window.innerWidth;
 
+            currentCard.style.transition = 'all 0.5s ease-out';
+
             if (cardRect.right < screenWidth * 0.2) {
                 nextCard();
             } else if (cardRect.left > screenWidth * 0.8) {
                 previousCard();
             } else {
                 currentCard.style.transform = '';
-                currentCard.style.transition = '';
             }
 
             currentCard.classList.remove('dragging');
@@ -255,12 +256,14 @@
             currentCard.classList.remove('fly-out-right', 'fly-out-left');
             currentCard.classList.add('fly-in');
             currentCard.style.transform = '';
+            currentCard.style.transition = 'all 1.3s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
         }
 
         function flyOutCurrentCard(direction) {
             const currentCard = cardStage.children[currentIndex];
             currentCard.classList.remove('fly-in', 'reveal');
             currentCard.style.transform = '';
+            currentCard.style.transition = 'all 1.3s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
             void currentCard.offsetWidth;
             currentCard.classList.add(direction === 'left' ? 'fly-out-left' : 'fly-out-right');
         }
