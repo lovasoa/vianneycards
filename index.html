@@ -213,8 +213,8 @@
                 isMoved = true;
                 const isRevealed = currentCard.classList.contains('reveal');
                 if (!isRevealed) deltaX *= -1;
-                const rotationY = 90 * Math.tanh(deltaX * 0.003);
-                const rotationX = 90 * Math.tanh(deltaY * 0.003);
+                const rotationY = 80 * Math.tanh(deltaX * 0.003);
+                const rotationX = -80 * Math.tanh(deltaY * 0.003);
                 currentCard.style.transform = `${startTransform} translate3d(${deltaX}px, ${deltaY}px, 0) rotateY(${rotationY}deg) rotateX(${rotationX}deg)`;
             }
         }
