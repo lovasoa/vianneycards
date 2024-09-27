@@ -58,14 +58,61 @@
             background-repeat: no-repeat;
             background-position: center;
             background-color: #2a2a2a;
+            overflow: hidden;
         }
+
+        .card::before,
+        .card::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 400%;
+            height: 400%;
+            background: linear-gradient(
+                115deg,
+                transparent 20%,
+                rgba(255, 255, 255, 0.3) 36%,
+                rgba(255, 255, 255, 0.5) 43%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 70%
+            );
+            transform: translate(-50%, -50%) rotate(0deg);
+            animation: shinyEffect 10s linear infinite;
+            mix-blend-mode: overlay;
+            pointer-events: none;
+        }
+
+        .card::after {
+            filter: hue-rotate(45deg);
+            opacity: 0.7;
+            animation-duration: 7s;
+        }
+
+        @keyframes shinyEffect {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        .card-container:hover .card::before,
+        .card-container:hover .card::after {
+            animation-duration: 2s;
+        }
+
         .card.face {
             transform: rotateY(0deg);
+            filter: brightness(1.1) contrast(1.1) saturate(1.2);
         }
+
         .card.back {
             transform: rotateY(180deg);
             background-size: cover;
             background-position: center;
+            filter: brightness(1.05) contrast(1.05) saturate(1.1);
         }
         .fly-in {
             transform: translateZ(-1000px) translateX(0) rotateY(180deg) rotateZ(10deg);
